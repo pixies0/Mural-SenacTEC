@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mural Digital</title>
+
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <h1><i class="fa-solid fa-envelope-open-text"></i> Mural Digital</h1>
+    <p>Compartilhe mensagens secretas e links com a turma. Clique no envelope para abri-lo!</p>
+  </header>
+
+  <main class="container">
+    <!-- Overlay/Modal do Formulário (Oculto por padrão) -->
+    <div id="modal-form" class="modal-overlay hidden">
+      <section class="form-container">
+        <div class="form-header">
+          <h2 id="form-title"><i class="fa-solid fa-plus"></i> Criar Novo Envelope</h2>
+          <button type="button" id="btn-close-form" class="btn-close" title="Fechar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form id="envelope-form">
+          <!-- Campo oculto para armazenar o ID quando estiver editando -->
+          <input type="hidden" id="envelope-id">
+
+          <div class="form-group">
+            <label for="mensagem">Mensagem / Conteúdo:</label>
+            <textarea id="mensagem" placeholder="Escreva sua mensagem secreta aqui..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="link">Hyperlink (opcional):</label>
+            <!-- Alterado para type="text" para não travar a validação do "https://" vazio -->
+            <input type="text" id="link" placeholder="https://exemplo.com">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">
+              <i class="fa-solid fa-paper-plane"></i> <span id="btn-submit-text">Salvar Envelope</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- Mural de Envelopes -->
+    <section class="mural-container">
+      <ul id="mural" class="mural-grid">
+        <!-- O card de adicionar (+) e os envelopes serão inseridos via JS -->
+      </ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="../../assets/voltar.js"></script>
+</body>
+</html>

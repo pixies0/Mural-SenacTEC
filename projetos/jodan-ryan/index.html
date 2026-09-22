@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  CARTA OCULTA — index.html
+  ----------------------------------------------------------------------------
+  Estrutura semântica da aplicação. Aqui NÃO há lógica nem estilo:
+    • o visual mora em  style.css
+    • o comportamento mora em  app.js
+  Essa separação (estrutura / apresentação / comportamento) é o padrão
+  profissional: cada arquivo tem uma única responsabilidade.
+  ============================================================================
+-->
+<!-- lang="pt-BR": informa idioma ao leitor de tela, ao corretor e ao Google. -->
+<html lang="pt-BR">
+<head>
+  <!-- charset UTF-8: garante acentos (ç, ã, é) e símbolos corretos. -->
+  <meta charset="UTF-8" />
+
+  <!-- viewport: faz o layout se adaptar à largura real do celular,
+       em vez de "fingir" uma tela de desktop de 980px. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- theme-color: pinta a barra do navegador mobile com o fundo do tema. -->
+  <meta name="theme-color" content="#0a0e14" />
+
+  <!-- description: resumo usado por buscadores e cartões de compartilhamento. -->
+  <meta name="description" content="Cartas ocultas criptografadas no navegador: textos, imagens e arquivos guardados em cache local com AES-256-GCM." />
+
+  <!-- color-scheme: avisa o navegador que a página é escura, então
+       barras de rolagem e controles nativos também ficam escuros. -->
+  <meta name="color-scheme" content="dark" />
+
+  <title>Carta Oculta</title>
+
+  <!-- Favicon inline em SVG (data URI): nenhum arquivo extra necessário.
+       %23 é o "#" codificado para URL. -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0e14'/><path d='M16 5 27 25H5z' fill='none' stroke='%23367bf0' stroke-width='2'/><circle cx='16' cy='18' r='3' fill='%2300ff9c'/></svg>" />
+
+  <!-- preconnect: abre a conexão com o Google Fonts antes de precisar,
+       economizando ~100ms no carregamento das fontes. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- JetBrains Mono (terminal) + Space Grotesk (títulos).
+       display=swap: mostra fonte do sistema até a web font chegar
+       (se estiver offline, a página continua funcionando). -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" />
+
+  <!-- Nossa folha de estilo. -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- defer: baixa o script em paralelo, mas só o executa depois que o HTML
+       inteiro foi lido (os elementos já existem quando o JS procura por eles).
+       Script clássico (sem type="module") para funcionar também com dois
+       cliques no arquivo: navegadores bloqueiam módulos em file://. -->
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <!-- Aviso para quem desativou JavaScript. -->
+  <noscript><p class="noscript">A Carta Oculta precisa de JavaScript ativado.</p></noscript>
+
+  <!-- Canvas da "chuva de dados" do fundo. aria-hidden: é decorativo,
+       então leitores de tela o ignoram. -->
+  <canvas id="rain" aria-hidden="true"></canvas>
+
+  <!-- ===================== BARRA SUPERIOR ===================== -->
+  <header class="topbar" id="topbar">
+    <div class="brand">
+      <!-- Logotipo original: triângulo (o "selo") com um olho (o "oculto"). -->
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 4 28 26H4z" />
+        <circle cx="16" cy="18" r="3.2" />
+      </svg>
+      <!-- Estilo prompt de shell: usuário@máquina:~$ -->
+      <h1 class="brand-title">
+        <span class="prompt-user">root</span><span class="prompt-at">@</span><span class="prompt-host">carta-oculta</span><span class="prompt-path">:~#</span>
+      </h1>
+    </div>
+
+    <!-- Chips de status preenchidos pelo JavaScript.
+         aria-live="polite": o leitor de tela anuncia mudanças sem interromper. -->
+    <ul class="status" aria-live="polite">
+      <li class="chip" id="chip-secure">verificando…</li>
+      <li class="chip" id="chip-storage">cache: —</li>
+    </ul>
+  </header>
+
+  <!-- ===================== LAYOUT PRINCIPAL ===================== -->
+  <main class="layout" id="layout">
+
+    <!-- ---------- Coluna 1: o baralho (lista de cartas) ---------- -->
+    <aside class="panel deck" aria-labelledby="deck-title">
+      <div class="panel-head">
+        <h2 id="deck-title" class="panel-title">// baralho</h2>
+        <!-- type="button": sem isso, um <button> dentro de form faria submit. -->
+        <button type="button" class="btn btn-primary" id="btn-new">+ nova carta</button>
+      </div>
+      <!-- A lista é gerada dinamicamente. role implícito = list. -->
+      <ul class="deck-list" id="deck-list"></ul>
+      <p class="deck-empty" id="deck-empty">Nenhuma carta forjada ainda.</p>
+
+      <!-- Backup: exporta/importa o cofre (continua cifrado no arquivo). -->
+      <div class="deck-tools">
+        <button type="button" class="btn btn-ghost" id="btn-export" title="Baixar backup cifrado">exportar</button>
+        <button type="button" class="btn btn-ghost" id="btn-import" title="Restaurar de um backup">importar</button>
+        <!-- Input real fica invisível (sr-only); o botão acima o aciona via JS.
+             accept: o seletor de arquivos já filtra por .json. -->
+        <input id="import-input" type="file" accept=".json,application/json" class="sr-only" tabindex="-1" />
+      </div>
+    </aside>
+
+    <!-- ---------- Coluna 2: a MESA — todas as cartas lado a lado ---------- -->
+    <section class="stage" aria-labelledby="field-title">
+      <div class="mesa-head">
+        <h2 id="field-title" class="panel-title">// mesa</h2>
+        <!-- Contador atualizado pelo JS ("3 cartas em jogo"). -->
+        <p class="muted small" id="field-count">—</p>
+      </div>
+      <!-- A grade de cartas é gerada pelo JS (App.renderField).
+           A última posição é sempre um "espaço vazio" para forjar outra carta,
+           como a zona livre de um campo de duelo. -->
+      <div class="mesa" id="field"></div>
+    </section>
+
+    <!-- ---------- Coluna 3: terminal de eventos ---------- -->
+    <aside class="panel term" aria-labelledby="term-title">
+      <div class="panel-head">
+        <h2 id="term-title" class="panel-title">// terminal</h2>
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+      <!-- role="log": região que recebe mensagens em sequência. -->
+      <ol class="log" id="log" role="log" aria-live="polite"></ol>
+    </aside>
+  </main>
+
+  <!-- ===================== CARTA EM FOCO ("duelo") =====================
+       Camada que cobre a tela quando uma carta sai da mesa.
+       role="dialog" + aria-modal: leitores de tela tratam como janela modal.
+       Fica FORA do <main> para que o <main> possa ficar "inert" (inativo)
+       enquanto a carta está em foco. -->
+  <div class="duel" id="duel" role="dialog" aria-modal="true" aria-labelledby="front-title" hidden>
+    <button type="button" class="btn btn-ghost duel-close" id="duel-close" title="Voltar à mesa (Esc)">✕ voltar à mesa</button>
+    <!-- "scene" dá perspectiva 3D; "card" é o objeto que gira.
+         data-state controla o visual: sealed (selada) | open (aberta). -->
+    <div class="scene" id="scene">
+      <article class="card" id="card" data-state="sealed">
+
+        <!-- ======== FRENTE: carta selada ======== -->
+        <div class="face front" id="front">
+          <!-- Cantos ornamentais (puramente visuais). -->
+          <span class="corner tl" aria-hidden="true"></span>
+          <span class="corner tr" aria-hidden="true"></span>
+          <span class="corner bl" aria-hidden="true"></span>
+          <span class="corner br" aria-hidden="true"></span>
+
+          <p class="front-kicker" id="front-kicker">ARCANO · SELADO</p>
+
+          <!-- Arte procedural: cada carta tem um sigilo ÚNICO,
+               gerado a partir do seu id (ver Sigil no app.js). -->
+          <div class="front-art" id="front-art" aria-hidden="true"></div>
+          <!-- Nível: uma estrela por fragmento guardado (máx. 12). -->
+          <p class="front-level" id="front-level" aria-label="Nível">—</p>
+
+          <h3 class="front-title" id="front-title">—</h3>
+          <p class="front-meta" id="front-meta">—</p>
+
+          <!-- Formulário de desbloqueio. autocomplete="off" no form e
+               "current-password" no campo: gerenciadores de senha
+               entendem o contexto corretamente. -->
+          <form class="unlock" id="unlock-form" autocomplete="off">
+            <!-- Label visualmente oculta, mas lida por leitores de tela. -->
+            <label for="unlock-pass" class="sr-only">Senha da carta</label>
+            <input id="unlock-pass" name="pass" type="password"
+                   autocomplete="current-password" placeholder="frase-senha"
+                   required minlength="1" />
+            <button type="submit" class="btn btn-primary" id="unlock-btn">revelar</button>
+          </form>
+          <p class="front-hint">AES-256-GCM · PBKDF2 · só existe no seu navegador</p>
+        </div>
+
+        <!-- ======== VERSO: carta aberta ======== -->
+        <div class="face back" id="back">
+          <header class="back-head">
+            <div>
+              <p class="back-kicker">ARCANO · ABERTO</p>
+              <h3 class="back-title" id="back-title">—</h3>
+            </div>
+            <div class="back-actions">
+              <!-- Contador regressivo do bloqueio automático. -->
+              <span class="timer" id="lock-timer" title="Bloqueio automático">02:00</span>
+              <button type="button" class="btn btn-ghost" id="btn-lock" title="Selar (Esc)">selar</button>
+              <button type="button" class="btn btn-danger" id="btn-delete-card">queimar</button>
+            </div>
+          </header>
+
+          <!-- Grade de fragmentos (conteúdos anexados). -->
+          <div class="items" id="items" aria-live="polite"></div>
+
+          <!-- Compositor: onde se escreve texto ou anexa arquivos. -->
+          <form class="composer" id="composer">
+            <label for="note" class="sr-only">Nova nota</label>
+            <textarea id="note" rows="3"
+                      placeholder="escreva um segredo… (Ctrl+Enter salva · cole imagens com Ctrl+V · arraste arquivos)"></textarea>
+            <div class="composer-bar">
+              <!-- Botão de verdade (alcançável pelo Tab) que abre o seletor.
+                   O <input type=file> fica visualmente oculto (sr-only);
+                   "multiple" permite escolher vários arquivos de uma vez. -->
+              <button type="button" class="btn btn-ghost" id="btn-attach">anexar</button>
+              <input id="file-input" type="file" multiple class="sr-only" tabindex="-1" />
+              <button type="submit" class="btn btn-primary">gravar nota</button>
+            </div>
+          </form>
+
+          <!-- Sobreposição exibida ao arrastar arquivos. -->
+          <div class="dropzone" aria-hidden="true"><span>solte para selar na carta</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== DIÁLOGO: NOVA CARTA ===================== -->
+  <!-- <dialog> nativo: foco preso, Esc fecha e fundo ::backdrop grátis. -->
+  <dialog class="modal" id="dlg-new" aria-labelledby="dlg-new-title">
+    <form id="new-form" method="dialog" autocomplete="off">
+      <h2 id="dlg-new-title" class="modal-title">forjar nova carta</h2>
+
+      <label class="field">
+        <span>codinome (visível no baralho)</span>
+        <input name="title" type="text" maxlength="40" required placeholder="ex.: O Enforcado" />
+      </label>
+
+      <label class="field">
+        <span>frase-senha</span>
+        <input name="pass" id="new-pass" type="password" minlength="8" required autocomplete="new-password" />
+      </label>
+
+      <!-- Medidor de força: <meter> é o elemento semântico correto. -->
+      <meter id="strength" min="0" max="4" low="2" high="3" optimum="4" value="0"></meter>
+      <p class="muted small" id="strength-label">força: —</p>
+
+      <label class="field">
+        <span>confirmar frase-senha</span>
+        <input name="confirm" type="password" minlength="8" required autocomplete="new-password" />
+      </label>
+
+      <p class="warn small">Sem a senha, ninguém — nem você — recupera o conteúdo. Não existe "esqueci a senha".</p>
+
+      <div class="modal-actions">
+        <!-- value="cancel" + formnovalidate: fecha sem validar campos. -->
+        <button type="submit" value="cancel" formnovalidate class="btn btn-ghost">cancelar</button>
+        <button type="submit" value="create" class="btn btn-primary">forjar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===================== DIÁLOGO: VISUALIZADOR ===================== -->
+  <dialog class="modal viewer" id="dlg-view" aria-label="Visualizar imagem">
+    <img id="view-img" alt="" />
+    <p class="muted small" id="view-caption"></p>
+    <form method="dialog"><button class="btn btn-ghost" autofocus>fechar</button></form>
+  </dialog>
+  <script src="../../assets/voltar.js"></script>
+</body>
+</html>

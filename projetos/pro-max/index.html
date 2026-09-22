@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartas PRO MAX — Mural</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Cartas PRO MAX</h1>
+      <p class="subtitulo">
+        Cada envelope guarda uma conexão. Clique para revelar.
+      </p>
+      <div class="barra-mural">
+        <p id="quantidade"></p>
+        <button id="novaCarta" class="btn-carta" type="button">
+          ＋ Novo envelope
+        </button>
+      </div>
+      <section
+        id="cartas"
+        class="cartas"
+        aria-label="Mural de envelopes"
+      ></section>
+      <p id="vazio" class="vazio">
+        Seu mural começa com uma mensagem.<br />Crie um envelope e escreva
+        diretamente na carta.
+      </p>
+      <p class="nota">
+        As cartas ficam salvas neste navegador. O conteúdo só aparece ao abrir o
+        envelope.
+      </p>
+      <p id="statusMural" role="status"></p>
+    </main>
+
+    <dialog id="modal" aria-labelledby="tituloCarta">
+      <article class="carta-aberta">
+        <button
+          id="fecharCarta"
+          class="fechar"
+          type="button"
+          aria-label="Fechar envelope"
+        >
+          ✕
+        </button>
+        <header>
+          <p class="sobretitulo">UMA MENSAGEM PARA CONECTAR</p>
+          <h2 id="tituloCarta"></h2>
+          <p id="dicaCarta" class="dica"></p>
+        </header>
+        <!-- O próprio papel é editável; não existe formulário separado. -->
+        <div
+          id="editorCarta"
+          class="papel"
+          contenteditable="plaintext-only"
+          role="textbox"
+          aria-label="Conteúdo da carta"
+          aria-multiline="true"
+          data-placeholder="Escreva aqui sua mensagem… Cole também links completos, como https://exemplo.com."
+        ></div>
+        <div id="leituraCarta" class="papel" hidden></div>
+        <footer>
+          <p id="contador" class="contador"></p>
+          <div class="acoes-carta">
+            <button id="editarCarta" class="btn-carta" type="button">
+              ✎ Editar mensagem
+            </button>
+            <button id="concluirCarta" class="btn-carta" type="button">
+              💌 Guardar e fechar
+            </button>
+            <button
+              id="excluirCarta"
+              class="btn-carta btn-secundario"
+              type="button"
+            >
+              Excluir envelope
+            </button>
+          </div>
+          <p id="statusCarta" class="status-carta" role="status"></p>
+        </footer>
+      </article>
+    </dialog>
+    <script src="../../assets/voltar.js"></script>
+</body>
+</html>

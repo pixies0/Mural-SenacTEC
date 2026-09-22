@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural de Envelopes Digitais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Tela de Boas-Vindas -->
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="welcome-box">
+            <span class="welcome-icon">✉️</span>
+            <h1>Mural de Envelopes Interativos</h1>
+            <p>Descubra recados, links e curiosidades secretas compartilhadas pela turma.</p>
+            <button id="btnEnterMural" class="btn-enter">Entrar no Mural</button>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal do Mural -->
+    <div id="mainContent" class="main-content hidden">
+        <header>
+            <h1>✉️ Mural de Envelopes Interativos</h1>
+            <p>Clique em um cartão para revelar ou gerencie as mensagens abaixo!</p>
+            <div class="header-actions">
+                <button id="btnOpenModal" class="btn-action-open">✉️ Escrever Nova Mensagem</button>
+                <!-- NOVO: Botão Limpar Tudo -->
+                <button id="btnClearAll" class="btn-action-clear">🗑️ Limpar Todo o Mural</button>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Mural de Envelopes -->
+            <section class="mural-container">
+                <h2>Mural de Recados</h2>
+                <div id="mural" class="mural-grid">
+                    <!-- Os cartões serão injetados dinamicamente via JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para Escrever a Mensagem -->
+    <div id="envelopeModal" class="modal-overlay hidden-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Criar Card #<span id="nextId">1</span></h2>
+                <button id="btnCloseModal" class="btn-close-modal">&times;</button>
+            </div>
+            <form id="envelopeForm">
+                <div class="form-group">
+                    <label for="texto">Mensagem / Conteúdo:</label>
+                    <textarea id="texto" placeholder="Digite sua mensagem secreta ou curiosidade..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="link">Hyperlink (Opcional):</label>
+                    <input type="url" id="link" placeholder="https://exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Escolha a cor do Envelope:</label>
+                    <div class="color-picker-container">
+                        <label class="color-option" style="background-color: #f1c40f;">
+                            <input type="radio" name="cor" value="#f1c40f" checked>
+                        </label>
+                        <label class="color-option" style="background-color: #ff7675;">
+                            <input type="radio" name="cor" value="#ff7675">
+                        </label>
+                        <label class="color-option" style="background-color: #55efc4;">
+                            <input type="radio" name="cor" value="#55efc4">
+                        </label>
+                        <label class="color-option" style="background-color: #74b9ff;">
+                            <input type="radio" name="cor" value="#74b9ff">
+                        </label>
+                        <label class="color-option" style="background-color: #a29bfe;">
+                            <input type="radio" name="cor" value="#a29bfe">
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Salvar no Mural</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+  <script src="../../assets/voltar.js"></script>
+</body>
+</html>
+
+
+
