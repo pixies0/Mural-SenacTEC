@@ -1,542 +1,1192 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mural Interativo Pastel - Tema Creme e Preto</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background-color: #fff9e6; /* Amarelo Creme */
-      color: #4a4e69;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 40px 20px;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mural Interativo Pastel - Tema Creme e Preto</title>
+    <style>
+      body {
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background-color: #fff9e6; /* Amarelo Creme */
+        color: #4a4e69;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 40px 20px;
+        box-sizing: border-box;
+        overflow-x: hidden;
+      }
 
-    h1 {
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #000000; /* Nome Mural em Preto */
-    }
+      h1 {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #000000;
+      }
 
-    p.subtitle {
-      margin-bottom: 28px;
-      color: #7d8597;
-      font-size: 0.95rem;
-    }
+      p.subtitle {
+        margin-bottom: 28px;
+        color: #7d8597;
+        font-size: 0.95rem;
+        text-align: center;
+      }
 
-    /* Form para Criar Cartão */
-    .card-form {
-      background-color: #ffffff;
-      padding: 16px 20px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      width: 100%;
-      max-width: 960px;
-      margin-bottom: 36px;
-      box-sizing: border-box;
-      align-items: center;
-    }
+      /* Container do Botão Preto Adicionar Card */
+      .add-card-wrapper {
+        position: relative;
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: center;
+      }
 
-    .card-form input, .card-form select {
-      flex: 1;
-      min-width: 200px;
-      padding: 12px 16px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s ease;
-      color: #4a4e69;
-      background-color: #fdfbfb;
-    }
+      /* Botão Preto Standalone (Sem Barra) */
+      .btn-add-card {
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 13px 28px;
+        border-radius: 50px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        transition:
+          background-color 0.2s ease,
+          transform 0.15s ease,
+          box-shadow 0.2s ease;
+      }
 
-    .card-form input:focus, .card-form select:focus {
-      border-color: #000000;
-    }
+      .btn-add-card:hover {
+        background-color: #222222;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      }
 
-    /* Botão Principal Preto */
-    .card-form button {
-      background-color: #000000; /* Botão Preto */
-      color: #ffffff;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
-    }
+      .btn-add-card .arrow-icon {
+        font-size: 0.75rem;
+        transition: transform 0.2s ease;
+      }
 
-    .card-form button:hover {
-      background-color: #333333; /* Cinza escuro ao passar o mouse */
-    }
+      .btn-add-card.active .arrow-icon {
+        transform: rotate(180deg);
+      }
 
-    /* Grid do Mural */
-    .mural-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 24px;
-      max-width: 960px;
-      width: 100%;
-      counter-reset: card-counter;
-    }
+      /* Menu Flutuante que abre ao clicar no Botão */
+      .color-picker-popover {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ffffff;
+        padding: 18px 20px;
+        border-radius: 18px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        width: 320px;
+        z-index: 100;
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        box-sizing: border-box;
+        animation: popoverFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
 
-    /* Estrutura do Cartão 3D */
-    .card {
-      background-color: transparent;
-      height: 250px;
-      perspective: 1000px;
-      counter-increment: card-counter;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
+      .color-picker-popover.active {
+        display: flex;
+      }
 
-    .card.deleting {
-      opacity: 0;
-      transform: scale(0.8);
-    }
+      @keyframes popoverFade {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -6px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
 
-    .card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-    }
+      .popover-header {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #2b2d42;
+      }
 
-    .card.flipped .card-inner {
-      transform: rotateY(180deg);
-    }
+      .popover-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        outline: none;
+        box-sizing: border-box;
+        color: #4a4e69;
+        background-color: #fdfbfb;
+        transition: border-color 0.2s ease;
+      }
 
-    .card-front, .card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
-      border-radius: 20px;
-      box-sizing: border-box;
-    }
+      .popover-input:focus {
+        border-color: #000000;
+      }
 
-    /* Frente do Cartão */
-    .card-front {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      cursor: pointer;
-      user-select: none;
-    }
+      .color-picker-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #7d8597;
+      }
 
-    .card-number-badge {
-      position: absolute;
-      top: 14px;
-      left: 16px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #5d627b;
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(4px);
-      padding: 3px 10px;
-      border-radius: 12px;
-    }
+      .palette-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+      }
 
-    .card-number-badge::before {
-      content: "#" counter(card-counter, decimal-leading-zero);
-    }
+      .palette-item {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 2.5px solid transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.15s ease,
+          border-color 0.15s ease,
+          box-shadow 0.15s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+        position: relative;
+      }
 
-    .btn-delete {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      background: rgba(255, 255, 255, 0.7);
-      border: none;
-      color: #e63946;
-      font-size: 0.85rem;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, transform 0.1s;
-      z-index: 2;
-    }
+      .palette-item:hover {
+        transform: scale(1.18);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
 
-    .btn-delete:hover {
-      background: #ffdadf;
-      transform: scale(1.1);
-    }
+      .palette-item.selected {
+        border-color: #000000;
+        transform: scale(1.12);
+      }
 
-    .card-front-title {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #3d405b;
-      margin-bottom: 6px;
-    }
+      .palette-item .check-icon {
+        display: none;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #333333;
+      }
 
-    .card-front-hint {
-      font-size: 0.8rem;
-      color: #6c757d;
-      opacity: 0.8;
-    }
+      .palette-item.selected .check-icon {
+        display: block;
+      }
 
-    /* Verso do Cartão com Textarea */
-    .card-back {
-      background-color: #ffffff;
-      transform: rotateY(180deg);
-      border: 2px solid #f0efeb;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-    }
+      .color-selected-info {
+        font-size: 0.8rem;
+        color: #7d8597;
+        text-align: center;
+        margin-top: -2px;
+      }
 
-    .card-back-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      gap: 6px;
-    }
+      .btn-confirm-add {
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        width: 100%;
+      }
 
-    .action-btn {
-      background: #f1f3f5;
-      border: none;
-      color: #495057;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 5px 9px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+      .btn-confirm-add:hover {
+        background-color: #333333;
+      }
 
-    .action-btn:hover {
-      background: #e9ecef;
-    }
+      /* Grid do Mural */
+      .mural-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
+        max-width: 960px;
+        width: 100%;
+        counter-reset: card-counter;
+      }
 
-    .action-btn.expand-btn {
-      background: #000000;
-      color: #ffffff;
-    }
+      /* Estrutura do Cartão 3D */
+      .card {
+        background-color: transparent;
+        height: 250px;
+        perspective: 1000px;
+        counter-increment: card-counter;
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
 
-    .action-btn.expand-btn:hover {
-      background: #333333;
-    }
+      .card.deleting {
+        opacity: 0;
+        transform: scale(0.8);
+      }
 
-    /* Área de texto */
-    .card-back textarea {
-      width: 100%;
-      flex: 1;
-      border: none;
-      resize: none;
-      outline: none;
-      font-family: inherit;
-      font-size: 0.9rem;
-      color: #2b2d42;
-      line-height: 1.4;
-      background: transparent;
-      box-sizing: border-box;
-      cursor: text;
-    }
+      .card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+      }
 
-    .card-back textarea::-webkit-scrollbar {
-      width: 5px;
-    }
+      .card.flipped .card-inner {
+        transform: rotateY(180deg);
+      }
 
-    .card-back textarea::-webkit-scrollbar-thumb {
-      background: #d1d5db;
-      border-radius: 10px;
-    }
+      .card-front,
+      .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border-radius: 20px;
+        box-sizing: border-box;
+      }
 
-    .char-counter {
-      font-size: 0.7rem;
-      color: #a0aec0;
-      text-align: right;
-      margin-top: 4px;
-    }
+      /* Frente do Cartão */
+      .card-front {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        cursor: pointer;
+        user-select: none;
+      }
 
-    /* Modal de Expansão (Tela Cheia) */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
+      .card-number-badge {
+        position: absolute;
+        top: 14px;
+        left: 16px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #5d627b;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(4px);
+        padding: 3px 10px;
+        border-radius: 12px;
+      }
 
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+      .card-number-badge::before {
+        content: "#" counter(card-counter, decimal-leading-zero);
+      }
 
-    .modal-content {
-      width: 90%;
-      max-width: 650px;
-      height: 70vh;
-      border-radius: 24px;
-      padding: 24px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-      position: relative;
-    }
+      .btn-delete {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        background: rgba(255, 255, 255, 0.7);
+        border: none;
+        color: #e63946;
+        font-size: 0.85rem;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+        z-index: 2;
+      }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
+      .btn-delete:hover {
+        background: #ffdadf;
+        transform: scale(1.1);
+      }
 
-    .modal-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #3d405b;
-    }
+      .card-front-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #3d405b;
+        margin-bottom: 6px;
+        word-break: break-word;
+        padding: 0 10px;
+      }
 
-    .modal-textarea {
-      width: 100%;
-      flex: 1;
-      border: 1.5px solid rgba(0, 0, 0, 0.08);
-      border-radius: 14px;
-      padding: 16px;
-      font-family: inherit;
-      font-size: 1rem;
-      line-height: 1.5;
-      color: #2b2d42;
-      resize: none;
-      outline: none;
-      background: rgba(255, 255, 255, 0.8);
-      box-sizing: border-box;
-    }
+      .card-front-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+        opacity: 0.8;
+      }
 
-    /* Botão Modal Preto */
-    .modal-close-btn {
-      background: #000000;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      align-self: flex-end;
-      margin-top: 14px;
-      transition: background-color 0.2s ease;
-    }
+      .card-date {
+        font-size: 0.72rem;
+        color: #5d627b;
+        margin-top: 10px;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.55);
+        padding: 3px 9px;
+        border-radius: 10px;
+      }
 
-    .modal-close-btn:hover {
-      background: #333333;
-    }
+      /* Verso do Cartão com Textarea */
+      .card-back {
+        background-color: #ffffff;
+        transform: rotateY(180deg);
+        border: 2px solid #f0efeb;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+      }
 
-    /* Cores Pasteis */
-    .pastel-menta    { background-color: #d8e2dc; }
-    .pastel-pessego  { background-color: #ffe5d9; }
-    .pastel-rosa     { background-color: #fec5bb; }
-    .pastel-lavanda  { background-color: #e8dff5; }
-    .pastel-azul     { background-color: #d8e1e9; }
-    .pastel-amarelo  { background-color: #faedcd; }
-  </style>
+      .card-back-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 6px;
+      }
+
+      .card-back-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .action-btn {
+        background: #f1f3f5;
+        border: none;
+        color: #495057;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 5px 9px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .action-btn:hover {
+        background: #e9ecef;
+      }
+
+      /* Botão Salvar Específico do Card */
+      .action-btn.save-card-btn {
+        background: #000000;
+        color: #ffffff;
+      }
+
+      .action-btn.save-card-btn:hover {
+        background: #333333;
+      }
+
+      .action-btn.save-card-btn.success {
+        background: #2b9348 !important;
+        color: #ffffff !important;
+      }
+
+      .action-btn.expand-btn {
+        background: #f1f3f5;
+        color: #333333;
+      }
+
+      .action-btn.expand-btn:hover {
+        background: #e2e8f0;
+      }
+
+      /* Área de texto */
+      .card-back textarea {
+        width: 100%;
+        flex: 1;
+        border: none;
+        resize: none;
+        outline: none;
+        font-family: inherit;
+        font-size: 0.9rem;
+        color: #2b2d42;
+        line-height: 1.4;
+        background: transparent;
+        box-sizing: border-box;
+        cursor: text;
+      }
+
+      .card-back textarea::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .card-back textarea::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 10px;
+      }
+
+      .card-back-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 6px;
+        font-size: 0.7rem;
+        color: #a0aec0;
+      }
+
+      .card-status-msg {
+        font-weight: 600;
+        color: #2b9348;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .card-status-msg.visible {
+        opacity: 1;
+      }
+
+      /* Modal de Expansão (Tela Cheia) */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-content {
+        width: 90%;
+        max-width: 680px;
+        height: 75vh;
+        border-radius: 24px;
+        padding: 24px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        position: relative;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+      }
+
+      .modal-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: #3d405b;
+        word-break: break-word;
+      }
+
+      .modal-date {
+        font-size: 0.75rem;
+        color: #7d8597;
+        margin-top: 3px;
+      }
+
+      .modal-textarea {
+        width: 100%;
+        flex: 1;
+        border: 1.5px solid rgba(0, 0, 0, 0.08);
+        border-radius: 14px;
+        padding: 16px;
+        font-family: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #2b2d42;
+        resize: none;
+        outline: none;
+        background: rgba(255, 255, 255, 0.85);
+        box-sizing: border-box;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 14px;
+      }
+
+      .modal-save-feedback {
+        font-size: 0.85rem;
+        color: #2b9348;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .modal-save-feedback.visible {
+        opacity: 1;
+      }
+
+      .modal-footer-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .modal-save-btn {
+        background: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .modal-save-btn:hover {
+        background: #333333;
+      }
+
+      /* Toast Notification */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(15px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        pointer-events: none;
+        z-index: 2000;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Cores Pasteis */
+      .pastel-menta {
+        background-color: #d8e2dc;
+      }
+      .pastel-pessego {
+        background-color: #ffe5d9;
+      }
+      .pastel-rosa {
+        background-color: #fec5bb;
+      }
+      .pastel-lavanda {
+        background-color: #e8dff5;
+      }
+      .pastel-azul {
+        background-color: #d8e1e9;
+      }
+      .pastel-amarelo {
+        background-color: #faedcd;
+      }
+    </style>
+  <link rel="stylesheet" href="../../assets/cartoes-fixos.css">
 </head>
-<body>
+  <body>
 
-  <h1>Mural Interativo</h1>
-  <p class="subtitle">Clique no cartão para virar. No verso, clique fora do texto ou em "← Voltar" para desvirar.</p>
+    <h1>Mural Interativo</h1>
+    <p class="subtitle">
+      Clique no cartão para virar. No verso, clique fora do texto ou em "←
+      Voltar" para desvirar.
+    </p>
 
-  <!-- Form para criar novos cards -->
-  <div class="card-form">
-    <input type="text" id="frontTitleInput" placeholder="Título do Cartão (ex: Lembrete)">
-    <select id="colorSelect">
-      <option value="pastel-menta">Menta</option>
-      <option value="pastel-pessego">Pêssego</option>
-      <option value="pastel-rosa">Rosa</option>
-      <option value="pastel-lavanda">Lavanda</option>
-      <option value="pastel-azul">Azul</option>
-      <option value="pastel-amarelo">Amarelo</option>
-    </select>
-    <button onclick="addNewCard()">+ Novo Cartão</button>
-  </div>
+    <!-- Apenas o botão preto (sem nenhuma barra no body) -->
+    <div class="add-card-wrapper" id="addCardWrapper">
+      <button
+        type="button"
+        class="btn-add-card"
+        id="btnAddCard"
+        onclick="toggleColorPicker(event)"
+      >
+        <span>+ Adicionar Card</span>
+        <span class="arrow-icon">▾</span>
+      </button>
 
-  <!-- Container dos Cards -->
-  <div class="mural-grid" id="muralGrid">
-    
-    <!-- Card 1 -->
-    <div class="card" id="card-1">
-      <div class="card-inner">
-        <div class="card-front pastel-menta" onclick="toggleFlip('card-1')">
-          <span class="card-number-badge"></span>
-          <button class="btn-delete" title="Excluir Cartão" onclick="deleteCard('card-1', event)">🗑️</button>
-          <div class="card-front-title">✨ Anotações</div>
-          <div class="card-front-hint">Clique para virar ↻</div>
+      <!-- Popover que surge ao clicar no botão -->
+      <div class="color-picker-popover" id="colorPickerPopover">
+        <div class="popover-header">Novo Cartão</div>
+        <input
+          type="text"
+          id="frontTitleInput"
+          class="popover-input"
+          placeholder="Título (ex: Ideias, Tarefas)..."
+        />
+
+        <div class="color-picker-label">Selecione uma cor:</div>
+        <div class="palette-grid">
+          <button
+            type="button"
+            class="palette-item pastel-menta selected"
+            data-color="pastel-menta"
+            data-name="Menta"
+            title="Menta"
+            onclick="pickColor('pastel-menta', 'Menta', this)"
+          >
+            <span class="check-icon">✓</span>
+          </button>
+          <button
+            type="button"
+            class="palette-item pastel-pessego"
+            data-color="pastel-pessego"
+            data-name="Pêssego"
+            title="Pêssego"
+            onclick="pickColor('pastel-pessego', 'Pêssego', this)"
+          >
+            <span class="check-icon">✓</span>
+          </button>
+          <button
+            type="button"
+            class="palette-item pastel-rosa"
+            data-color="pastel-rosa"
+            data-name="Rosa"
+            title="Rosa"
+            onclick="pickColor('pastel-rosa', 'Rosa', this)"
+          >
+            <span class="check-icon">✓</span>
+          </button>
+          <button
+            type="button"
+            class="palette-item pastel-lavanda"
+            data-color="pastel-lavanda"
+            data-name="Lavanda"
+            title="Lavanda"
+            onclick="pickColor('pastel-lavanda', 'Lavanda', this)"
+          >
+            <span class="check-icon">✓</span>
+          </button>
+          <button
+            type="button"
+            class="palette-item pastel-azul"
+            data-color="pastel-azul"
+            data-name="Azul"
+            title="Azul"
+            onclick="pickColor('pastel-azul', 'Azul', this)"
+          >
+            <span class="check-icon">✓</span>
+          </button>
+          <button
+            type="button"
+            class="palette-item pastel-amarelo"
+            data-color="pastel-amarelo"
+            data-name="Amarelo"
+            title="Amarelo"
+            onclick="pickColor('pastel-amarelo', 'Amarelo', this)"
+          >
+            <span class="check-icon">✓</span>
+          </button>
         </div>
-        <div class="card-back" onclick="handleBackClick('card-1', event)">
-          <div class="card-back-header">
-            <button class="action-btn" onclick="toggleFlip('card-1')">← Voltar</button>
-            <div>
-              <button class="action-btn expand-btn" onclick="expandCard('card-1')">⤢ Expandir</button>
-              <button class="action-btn" style="color: #e63946;" onclick="deleteCard('card-1', event)">🗑️</button>
-            </div>
+        <div class="color-selected-info" id="colorSelectedInfo">
+          Cor selecionada: <strong>Menta</strong>
+        </div>
+
+        <button type="button" class="btn-confirm-add" onclick="addNewCard()">
+          Criar Cartão
+        </button>
+      </div>
+    </div>
+
+    <!-- Container dos Cards -->
+    <p class="ctf-mural-heading" id="missao"><strong>Operação Reiniciar · Estação 02: Duas credenciais, uma decisão</strong><br>Leia os 7 cartões da missão em ordem. Eles são fixos e não podem ser apagados pelos controles do mural.</p><div class="mural-grid" id="muralGrid">
+<!-- Cartões permanentes da atividade: editar somente neste HTML. -->
+<div class="card flipped" data-ctf-fixed id="ctf-2-1" data-ctf-title="01 · A missão"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">01 · A missão</div></div><div class="card-back"><div class="card-back-header"><strong>01 · A missão</strong></div><div class="ctf-preview"><p>Considere <strong>A = cartão válido</strong> e <strong>B = senha correta</strong>. A central precisa comparar regras de acesso.</p></div><button class="ctf-read" type="button" data-ctf-read="ctf-2-1" aria-haspopup="dialog">Ler cartão 01</button></div></div><div class="ctf-fixed-content" id="ctf-2-1-content" hidden><h2>01 · A missão</h2><p>Considere <strong>A = cartão válido</strong> e <strong>B = senha correta</strong>. A central precisa comparar regras de acesso.</p></div></div><div class="card flipped" data-ctf-fixed id="ctf-2-2" data-ctf-title="02 · Etapa 01"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">02 · Etapa 01</div></div><div class="card-back"><div class="card-back-header"><strong>02 · Etapa 01</strong></div><div class="ctf-preview">Construa as tabelas de <strong>AND</strong> e <strong>OR</strong>, usando as entradas na ordem <strong>00, 01, 10, 11</strong>.</div><button class="ctf-read" type="button" data-ctf-read="ctf-2-2" aria-haspopup="dialog">Ler cartão 02</button></div></div><div class="ctf-fixed-content" id="ctf-2-2-content" hidden><h2>02 · Etapa 01</h2>Construa as tabelas de <strong>AND</strong> e <strong>OR</strong>, usando as entradas na ordem <strong>00, 01, 10, 11</strong>.</div></div><div class="card flipped" data-ctf-fixed id="ctf-2-3" data-ctf-title="03 · Etapa 02"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">03 · Etapa 02</div></div><div class="card-back"><div class="card-back-header"><strong>03 · Etapa 02</strong></div><div class="ctf-preview">Construa a tabela de <strong>NOT</strong> para as entradas <strong>0, 1</strong>.</div><button class="ctf-read" type="button" data-ctf-read="ctf-2-3" aria-haspopup="dialog">Ler cartão 03</button></div></div><div class="ctf-fixed-content" id="ctf-2-3-content" hidden><h2>03 · Etapa 02</h2>Construa a tabela de <strong>NOT</strong> para as entradas <strong>0, 1</strong>.</div></div><div class="card flipped" data-ctf-fixed id="ctf-2-4" data-ctf-title="04 · Etapa 03"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">04 · Etapa 03</div></div><div class="card-back"><div class="card-back-header"><strong>04 · Etapa 03</strong></div><div class="ctf-preview">Explique a diferença entre AND e OR quando A = 1 e B = 0.</div><button class="ctf-read" type="button" data-ctf-read="ctf-2-4" aria-haspopup="dialog">Ler cartão 04</button></div></div><div class="ctf-fixed-content" id="ctf-2-4-content" hidden><h2>04 · Etapa 03</h2>Explique a diferença entre AND e OR quando A = 1 e B = 0.</div></div><div class="card flipped" data-ctf-fixed id="ctf-2-5" data-ctf-title="05 · Etapa 04"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">05 · Etapa 04</div></div><div class="card-back"><div class="card-back-header"><strong>05 · Etapa 04</strong></div><div class="ctf-preview"><p>Leia a coluna de saída de <strong>OR</strong>, de cima para baixo, como um número binário. Converta para decimal para obter o código da estação.</p></div><button class="ctf-read" type="button" data-ctf-read="ctf-2-5" aria-haspopup="dialog">Ler cartão 05</button></div></div><div class="ctf-fixed-content" id="ctf-2-5-content" hidden><h2>05 · Etapa 04</h2><p>Leia a coluna de saída de <strong>OR</strong>, de cima para baixo, como um número binário. Converta para decimal para obter o código da estação.</p></div></div><div class="card flipped" data-ctf-fixed id="ctf-2-6" data-ctf-title="06 · Dica"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">06 · Dica</div></div><div class="card-back"><div class="card-back-header"><strong>06 · Dica</strong></div><div class="ctf-preview">Na OR, as duas entradas também podem ser verdadeiras ao mesmo tempo.</div><button class="ctf-read" type="button" data-ctf-read="ctf-2-6" aria-haspopup="dialog">Ler cartão 06</button></div></div><div class="ctf-fixed-content" id="ctf-2-6-content" hidden><h2>06 · Dica</h2>Na OR, as duas entradas também podem ser verdadeiras ao mesmo tempo.</div></div><div class="card flipped" data-ctf-fixed id="ctf-2-7" data-ctf-title="07 · Monte sua flag"><div class="card-inner"><div class="card-front pastel-menta"><div class="card-front-title">07 · Monte sua flag</div></div><div class="card-back"><div class="card-back-header"><strong>07 · Monte sua flag</strong></div><div class="ctf-preview"><p>Use <code>MT{LOG-DD}</code>, substituindo DD pelo código decimal com dois algarismos.</p><p>Registre cálculos e justificativas no Whiteboard. Confira a flag e registre o resultado na tabela da equipe no Loop.</p><a href="../../index.html?desafio=2#verificador">Verificar a flag da estação 02 →</a></div><button class="ctf-read" type="button" data-ctf-read="ctf-2-7" aria-haspopup="dialog">Ler cartão 07</button></div></div><div class="ctf-fixed-content" id="ctf-2-7-content" hidden><h2>07 · Monte sua flag</h2><p>Use <code>MT{LOG-DD}</code>, substituindo DD pelo código decimal com dois algarismos.</p><p>Registre cálculos e justificativas no Whiteboard. Confira a flag e registre o resultado na tabela da equipe no Loop.</p><a href="../../index.html?desafio=2#verificador">Verificar a flag da estação 02 →</a></div></div></div>
+
+    <!-- Modal de Expansão (Tela Cheia) -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-content" id="modalContent">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="modalTitle">Título do Cartão</div>
+            <div class="modal-date" id="modalDate"></div>
           </div>
-          <textarea id="text-card-1" maxlength="2000" placeholder="Escreva seu recado aqui..." oninput="updateCounter('card-1')">Fundo amarelo creme e título/botões em preto aplicados com sucesso!</textarea>
-          <div class="char-counter" id="count-card-1">71/2000</div>
+          <div class="char-counter" id="modalCounter">0/2000</div>
+        </div>
+        <textarea
+          class="modal-textarea"
+          id="modalTextarea"
+          maxlength="2000"
+          placeholder="Digite seu texto completo aqui..."
+        ></textarea>
+        <div class="modal-footer">
+          <span class="modal-save-feedback" id="modalFeedback"
+            >✓ Salvo com sucesso!</span
+          >
+          <div class="modal-footer-actions">
+            <button
+              type="button"
+              class="modal-save-btn"
+              onclick="saveModalChanges(false)"
+            >
+              💾 Salvar
+            </button>
+            <button
+              type="button"
+              class="modal-save-btn"
+              onclick="saveModalChanges(true)"
+            >
+              Salvar e Fechar
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-  </div>
+    <!-- Notificação Toast -->
+    <div class="toast" id="toastMessage"></div>
 
-  <!-- Modal de Expansão (Tela Cheia) -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-content" id="modalContent">
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Título do Cartão</div>
-        <div class="char-counter" id="modalCounter">0/2000</div>
-      </div>
-      <textarea class="modal-textarea" id="modalTextarea" maxlength="2000" placeholder="Digite seu texto completo aqui..."></textarea>
-      <button class="modal-close-btn" onclick="closeModal()">Salvar e Fechar</button>
-    </div>
-  </div>
+    <script>
+      const STORAGE_KEY = "mural_interativo_cards";
+      let activeCardIdForModal = null;
+      let toastTimeout = null;
+      let selectedColor = "pastel-menta";
 
-  <script>
-    let cardCount = 1;
-    let activeCardIdForModal = null;
-
-    function toggleFlip(cardId) {
-      const card = document.getElementById(cardId);
-      if (card) {
-        card.classList.toggle('flipped');
+      // Toast de notificação
+      function showToast(message) {
+        const toast = document.getElementById("toastMessage");
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add("show");
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2500);
       }
-    }
 
-    function handleBackClick(cardId, event) {
-      const targetTag = event.target.tagName;
-      if (targetTag !== 'TEXTAREA' && targetTag !== 'BUTTON' && !event.target.closest('button')) {
-        toggleFlip(cardId);
+      // Formatação de data/hora (pt-BR)
+      function getFormattedDate() {
+        const now = new Date();
+        return now.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
       }
-    }
 
-    function deleteCard(cardId, event) {
-      if (event) event.stopPropagation();
-      const card = document.getElementById(cardId);
-      if (card && confirm('Deseja realmente excluir este cartão?')) {
-        card.classList.add('deleting');
-        setTimeout(() => {
-          card.remove();
-        }, 300);
+      // Prevenção de injeção XSS
+      function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
       }
-    }
 
-    function updateCounter(cardId) {
-      const textarea = document.getElementById(`text-${cardId}`);
-      const counter = document.getElementById(`count-${cardId}`);
-      if (textarea && counter) {
-        counter.textContent = `${textarea.value.length}/2000`;
+      // Carregar cartões do localStorage
+      function loadCardsFromStorage() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed;
+            }
+          }
+        } catch (err) {
+          console.error("Erro ao ler do localStorage:", err);
+        }
+
+        // Estado inicial padrão
+        return [
+          {
+            id: "card-" + Date.now(),
+            title: "✨ Anotações",
+            color: "pastel-menta",
+            text: 'Fundo amarelo creme e botões em preto aplicados com sucesso! Clique em "+ Adicionar Card" para escolher a cor e criar novos recados.',
+            date: getFormattedDate(),
+          },
+        ];
       }
-    }
 
-    function addNewCard() {
-      const titleInput = document.getElementById('frontTitleInput');
-      const title = titleInput.value.trim() || '✨ Novo Recado';
-      const color = document.getElementById('colorSelect').value;
+      // Salvar cartões no localStorage
+      function saveCardsToStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+        } catch (err) {
+          console.error("Erro ao salvar no localStorage:", err);
+          showToast("⚠️ Erro ao salvar informações no navegador.");
+        }
+      }
 
-      cardCount++;
-      const cardId = `card-${cardCount}`;
-      const grid = document.getElementById('muralGrid');
+      let cards = loadCardsFromStorage();
 
-      const newCard = document.createElement('div');
-      newCard.className = 'card';
-      newCard.id = cardId;
+      // Criar elemento HTML para um cartão
+      function createCardElement(card) {
+        const cardEl = document.createElement("div");
+        cardEl.className = "card";
+        cardEl.id = card.id;
 
-      newCard.innerHTML = `
+        const escapedTitle = escapeHtml(card.title);
+        const escapedText = escapeHtml(card.text || "");
+        const dateText = card.date ? escapeHtml(card.date) : getFormattedDate();
+
+        cardEl.innerHTML = `
         <div class="card-inner">
-          <div class="card-front ${color}" onclick="toggleFlip('${cardId}')">
+          <div class="card-front ${card.color || "pastel-menta"}" onclick="toggleFlip('${card.id}')">
             <span class="card-number-badge"></span>
-            <button class="btn-delete" title="Excluir Cartão" onclick="deleteCard('${cardId}', event)">🗑️</button>
-            <div class="card-front-title">${title}</div>
+            <button type="button" class="btn-delete" title="Excluir Cartão" onclick="deleteCard('${card.id}', event)">🗑️</button>
+            <div class="card-front-title">${escapedTitle}</div>
             <div class="card-front-hint">Clique para virar ↻</div>
+            <div class="card-date">🕒 ${dateText}</div>
           </div>
-          <div class="card-back" onclick="handleBackClick('${cardId}', event)">
+          <div class="card-back" onclick="handleBackClick('${card.id}', event)">
             <div class="card-back-header">
-              <button class="action-btn" onclick="toggleFlip('${cardId}')">← Voltar</button>
-              <div>
-                <button class="action-btn expand-btn" onclick="expandCard('${cardId}')">⤢ Expandir</button>
-                <button class="action-btn" style="color: #e63946;" onclick="deleteCard('${cardId}', event)">🗑️</button>
+              <button type="button" class="action-btn" onclick="toggleFlip('${card.id}')">← Voltar</button>
+              <div class="card-back-actions">
+                <button type="button" class="action-btn save-card-btn" id="save-btn-${card.id}" onclick="saveCardManually('${card.id}', event)" title="Salvar informações do cartão">
+                  💾 Salvar
+                </button>
+                <button type="button" class="action-btn expand-btn" onclick="expandCard('${card.id}')" title="Expandir em tela cheia">
+                  ⤢ Expandir
+                </button>
+                <button type="button" class="action-btn" style="color: #e63946;" onclick="deleteCard('${card.id}', event)" title="Excluir">
+                  🗑️
+                </button>
               </div>
             </div>
-            <textarea id="text-${cardId}" maxlength="2000" placeholder="Escreva seu recado aqui..." oninput="updateCounter('${cardId}')"></textarea>
-            <div class="char-counter" id="count-${cardId}">0/2000</div>
+            <textarea id="text-${card.id}" maxlength="2000" placeholder="Escreva seu recado aqui..." oninput="onCardTextInput('${card.id}')">${escapedText}</textarea>
+            <div class="card-back-footer">
+              <span>${dateText}</span>
+              <span class="card-status-msg" id="status-${card.id}">✓ Salvo!</span>
+              <div class="char-counter" id="count-${card.id}">${(card.text || "").length}/2000</div>
+            </div>
           </div>
         </div>
       `;
+        return cardEl;
+      }
 
-      grid.appendChild(newCard);
-      titleInput.value = '';
-    }
+      // Renderizar todos os cartões na tela
+      function renderCards() {
+        const grid = document.getElementById("muralGrid");
+        if (!grid) return;
+        Array.from(grid.children).filter(el => !el.hasAttribute('data-ctf-fixed')).forEach(el => el.remove());
+        cards.forEach((card) => {
+          grid.appendChild(createCardElement(card));
+        });
+      }
 
-    function expandCard(cardId) {
-      activeCardIdForModal = cardId;
-      const card = document.getElementById(cardId);
-      const cardTitle = card.querySelector('.card-front-title').textContent;
-      const cardColorClass = Array.from(card.querySelector('.card-front').classList).find(c => c.startsWith('pastel-'));
-      const cardTextarea = document.getElementById(`text-${cardId}`);
+      function toggleFlip(cardId) {
+        const card = document.getElementById(cardId);
+        if (card) {
+          card.classList.toggle("flipped");
+        }
+      }
 
-      const modalOverlay = document.getElementById('modalOverlay');
-      const modalContent = document.getElementById('modalContent');
-      const modalTitle = document.getElementById('modalTitle');
-      const modalTextarea = document.getElementById('modalTextarea');
+      function handleBackClick(cardId, event) {
+        const targetTag = event.target.tagName;
+        if (
+          targetTag !== "TEXTAREA" &&
+          targetTag !== "BUTTON" &&
+          !event.target.closest("button")
+        ) {
+          toggleFlip(cardId);
+        }
+      }
 
-      modalTitle.textContent = cardTitle;
-      modalContent.className = `modal-content ${cardColorClass}`;
-      modalTextarea.value = cardTextarea.value;
+      // Controle do Popover de Seleção de Cor
+      function toggleColorPicker(event) {
+        if (event) event.stopPropagation();
+        const popover = document.getElementById("colorPickerPopover");
+        const btn = document.getElementById("btnAddCard");
+        const isActive = popover.classList.contains("active");
 
-      updateModalCounter();
+        if (isActive) {
+          closeColorPicker();
+        } else {
+          popover.classList.add("active");
+          btn.classList.add("active");
+          const input = document.getElementById("frontTitleInput");
+          if (input) {
+            setTimeout(() => input.focus(), 50);
+          }
+        }
+      }
 
-      modalTextarea.oninput = () => {
-        cardTextarea.value = modalTextarea.value;
-        updateCounter(cardId);
+      function closeColorPicker() {
+        const popover = document.getElementById("colorPickerPopover");
+        const btn = document.getElementById("btnAddCard");
+        if (popover) popover.classList.remove("active");
+        if (btn) btn.classList.remove("active");
+      }
+
+      function pickColor(colorClass, colorName, element) {
+        selectedColor = colorClass;
+        document
+          .querySelectorAll(".palette-item")
+          .forEach((el) => el.classList.remove("selected"));
+        if (element) element.classList.add("selected");
+
+        const info = document.getElementById("colorSelectedInfo");
+        if (info) {
+          info.innerHTML = `Cor selecionada: <strong>${colorName}</strong>`;
+        }
+      }
+
+      // Ao digitar no verso do cartão
+      function onCardTextInput(cardId) {
+        const textarea = document.getElementById(`text-${cardId}`);
+        const counter = document.getElementById(`count-${cardId}`);
+        const card = cards.find((c) => c.id === cardId);
+
+        if (textarea && card) {
+          card.text = textarea.value;
+          if (counter) {
+            counter.textContent = `${textarea.value.length}/2000`;
+          }
+          saveCardsToStorage();
+        }
+      }
+
+      // Opção de Salvar Manualmente com Feedback Visual
+      function saveCardManually(cardId, event) {
+        if (event) event.stopPropagation();
+
+        const textarea = document.getElementById(`text-${cardId}`);
+        const saveBtn = document.getElementById(`save-btn-${cardId}`);
+        const statusMsg = document.getElementById(`status-${cardId}`);
+        const card = cards.find((c) => c.id === cardId);
+
+        if (textarea && card) {
+          card.text = textarea.value;
+        }
+        saveCardsToStorage();
+
+        if (saveBtn) {
+          saveBtn.classList.add("success");
+          saveBtn.innerHTML = "✓ Salvo!";
+          setTimeout(() => {
+            saveBtn.classList.remove("success");
+            saveBtn.innerHTML = "💾 Salvar";
+          }, 1500);
+        }
+
+        if (statusMsg) {
+          statusMsg.classList.add("visible");
+          setTimeout(() => {
+            statusMsg.classList.remove("visible");
+          }, 1500);
+        }
+
+        showToast("Informações do cartão salvas com sucesso!");
+      }
+
+      // Criar Novo Cartão
+      function addNewCard() {
+        const titleInput = document.getElementById("frontTitleInput");
+        const title = titleInput.value.trim() || "✨ Novo Recado";
+
+        const newCard = {
+          id: "card-" + Date.now(),
+          title: title,
+          color: selectedColor,
+          text: "",
+          date: getFormattedDate(),
+        };
+
+        cards.push(newCard);
+        saveCardsToStorage();
+
+        const grid = document.getElementById("muralGrid");
+        if (grid) {
+          grid.appendChild(createCardElement(newCard));
+        }
+
+        titleInput.value = "";
+        closeColorPicker();
+        showToast("Novo cartão adicionado!");
+      }
+
+      // Excluir Cartão
+      function deleteCard(cardId, event) {
+        if (event) event.stopPropagation();
+        const cardEl = document.getElementById(cardId);
+        if (cardEl && confirm("Deseja realmente excluir este cartão?")) {
+          cardEl.classList.add("deleting");
+          cards = cards.filter((c) => c.id !== cardId);
+          saveCardsToStorage();
+          setTimeout(() => {
+            cardEl.remove();
+          }, 300);
+          showToast("Cartão excluído.");
+        }
+      }
+
+      // Modal de Expansão
+      function expandCard(cardId) {
+        activeCardIdForModal = cardId;
+        const card = cards.find((c) => c.id === cardId);
+        if (!card) return;
+
+        const modalOverlay = document.getElementById("modalOverlay");
+        const modalContent = document.getElementById("modalContent");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalDate = document.getElementById("modalDate");
+        const modalTextarea = document.getElementById("modalTextarea");
+        const modalFeedback = document.getElementById("modalFeedback");
+        const cardTextarea = document.getElementById(`text-${cardId}`);
+
+        modalTitle.textContent = card.title;
+        modalDate.textContent = `Criado em: ${card.date || getFormattedDate()}`;
+        modalContent.className = `modal-content ${card.color || "pastel-menta"}`;
+        modalTextarea.value = card.text || "";
+        if (modalFeedback) modalFeedback.classList.remove("visible");
+
         updateModalCounter();
-      };
 
-      modalOverlay.classList.add('active');
-    }
+        modalTextarea.oninput = () => {
+          card.text = modalTextarea.value;
+          if (cardTextarea) {
+            cardTextarea.value = modalTextarea.value;
+            const counter = document.getElementById(`count-${cardId}`);
+            if (counter) {
+              counter.textContent = `${cardTextarea.value.length}/2000`;
+            }
+          }
+          updateModalCounter();
+          saveCardsToStorage();
+        };
 
-    function updateModalCounter() {
-      const modalTextarea = document.getElementById('modalTextarea');
-      const modalCounter = document.getElementById('modalCounter');
-      modalCounter.textContent = `${modalTextarea.value.length}/2000`;
-    }
+        modalOverlay.classList.add("active");
+      }
 
-    function closeModal() {
-      const modalOverlay = document.getElementById('modalOverlay');
-      modalOverlay.classList.remove('active');
-      activeCardIdForModal = null;
-    }
-  </script>
+      function updateModalCounter() {
+        const modalTextarea = document.getElementById("modalTextarea");
+        const modalCounter = document.getElementById("modalCounter");
+        if (modalTextarea && modalCounter) {
+          modalCounter.textContent = `${modalTextarea.value.length}/2000`;
+        }
+      }
 
-  <script src="../../assets/voltar.js"></script>
+      function saveModalChanges(shouldClose) {
+        if (!activeCardIdForModal) return;
+
+        const modalTextarea = document.getElementById("modalTextarea");
+        const cardTextarea = document.getElementById(
+          `text-${activeCardIdForModal}`,
+        );
+        const card = cards.find((c) => c.id === activeCardIdForModal);
+
+        if (card && modalTextarea) {
+          card.text = modalTextarea.value;
+          if (cardTextarea) {
+            cardTextarea.value = modalTextarea.value;
+            const counter = document.getElementById(
+              `count-${activeCardIdForModal}`,
+            );
+            if (counter) {
+              counter.textContent = `${cardTextarea.value.length}/2000`;
+            }
+          }
+          saveCardsToStorage();
+        }
+
+        const modalFeedback = document.getElementById("modalFeedback");
+        if (modalFeedback) {
+          modalFeedback.classList.add("visible");
+          setTimeout(() => {
+            modalFeedback.classList.remove("visible");
+          }, 1500);
+        }
+
+        showToast("Informações salvas com sucesso!");
+
+        if (shouldClose) {
+          closeModal();
+        }
+      }
+
+      function closeModal() {
+        const modalOverlay = document.getElementById("modalOverlay");
+        if (modalOverlay) {
+          modalOverlay.classList.remove("active");
+        }
+        activeCardIdForModal = null;
+      }
+
+      // Inicialização e atalhos de teclado
+      window.addEventListener("DOMContentLoaded", () => {
+        renderCards();
+
+        // Pressionar Enter no campo de título cria o cartão
+        const titleInput = document.getElementById("frontTitleInput");
+        if (titleInput) {
+          titleInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addNewCard();
+            }
+          });
+        }
+
+        // Fechar modal ou popover com tecla ESC
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            closeModal();
+            closeColorPicker();
+          }
+        });
+
+        // Fechar popover se clicar fora dele
+        document.addEventListener("click", (e) => {
+          const wrapper = document.getElementById("addCardWrapper");
+          if (wrapper && !wrapper.contains(e.target)) {
+            closeColorPicker();
+          }
+        });
+
+        // Fechar modal clicando fora dele (no overlay)
+        const modalOverlay = document.getElementById("modalOverlay");
+        if (modalOverlay) {
+          modalOverlay.addEventListener("click", (e) => {
+            if (e.target === modalOverlay) {
+              closeModal();
+            }
+          });
+        }
+      });
+    </script>
+    <script src="../../assets/voltar.js"></script>
+  <dialog id="ctf-reader" aria-labelledby="ctf-reader-title"><form method="dialog"><button class="ctf-close" aria-label="Fechar cartão">Fechar ×</button></form><h2 id="ctf-reader-title"></h2><div id="ctf-reader-content"></div></dialog><script src="../../assets/cartoes-fixos.js"></script>
 </body>
 </html>

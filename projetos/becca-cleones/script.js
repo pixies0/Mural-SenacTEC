@@ -34,7 +34,7 @@ window.addEventListener('click', (e) => {
 
 // NOVO: Evento para deletar o mural inteiro com dupla confirmação
 btnClearAll.addEventListener('click', () => {
-    if (envelopes.length === 0) {
+    if (envelopes.length === 0 && !mural.querySelector('[data-ctf-fixed]')) {
         alert("O mural já está vazio!");
         return;
     }
@@ -93,9 +93,9 @@ envelopeForm.addEventListener('submit', (e) => {
 });
 
 function renderizarMural() {
-    mural.innerHTML = '';
+    Array.from(mural.children).filter(el => !el.hasAttribute('data-ctf-fixed')).forEach(el => el.remove());
 
-    if (envelopes.length === 0) {
+    if (envelopes.length === 0 && !mural.querySelector('[data-ctf-fixed]')) {
         mural.innerHTML = '<p style="color: #7f8c8d; grid-column: 1/-1; text-align: center; margin-top: 40px;">Nenhum envelope criado ainda. Clique em "Escrever Nova Mensagem" para começar!</p>';
         return;
     }

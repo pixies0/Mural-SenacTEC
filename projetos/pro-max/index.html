@@ -6,8 +6,10 @@
     <title>Cartas PRO MAX — Mural</title>
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
-  </head>
+  <link rel="stylesheet" href="../../assets/cartoes-fixos.css">
+</head>
   <body>
+
     <main class="container">
       <h1>Cartas PRO MAX</h1>
       <p class="subtitulo">
@@ -19,11 +21,13 @@
           ＋ Novo envelope
         </button>
       </div>
-      <section
+      <p class="ctf-mural-heading" id="missao"><strong>Operação Reiniciar · Estação 05: A porta de saída</strong><br>Leia os 8 cartões da missão em ordem. Eles são fixos e não podem ser apagados pelos controles do mural.</p><section
         id="cartas"
         class="cartas"
         aria-label="Mural de envelopes"
-      ></section>
+      >
+<!-- Cartões permanentes da atividade: editar somente neste HTML. -->
+<div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-1" data-ctf-title="01 · A missão"><button class="carta" type="button" data-ctf-read="ctf-5-1" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">01 · A missão</span></button><div class="ctf-fixed-content" id="ctf-5-1-content" hidden><h2>01 · A missão</h2><p>A = cartão válido; B = autorização do instrutor; C = bloqueio de segurança ativo. A porta abre quando existe cartão válido <strong>ou</strong> autorização, desde que o bloqueio esteja desativado.</p></div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-2" data-ctf-title="02 · Etapa 01"><button class="carta" type="button" data-ctf-read="ctf-5-2" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">02 · Etapa 01</span></button><div class="ctf-fixed-content" id="ctf-5-2-content" hidden><h2>02 · Etapa 01</h2><p><strong>S = (A OR B) AND (NOT C)</strong></p></div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-3" data-ctf-title="03 · Etapa 02"><button class="carta" type="button" data-ctf-read="ctf-5-3" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">03 · Etapa 02</span></button><div class="ctf-fixed-content" id="ctf-5-3-content" hidden><h2>03 · Etapa 02</h2><p>Calcule os quatro testes na ordem abaixo (são casos selecionados, não a tabela completa).</p></div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-4" data-ctf-title="04 · Etapa 03"><button class="carta" type="button" data-ctf-read="ctf-5-4" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">04 · Etapa 03</span></button><div class="ctf-fixed-content" id="ctf-5-4-content" hidden><h2>04 · Etapa 03</h2><table><caption>Testes do controle de acesso</caption><thead><tr><th>Teste</th><th>A</th><th>B</th><th>C</th><th>S</th></tr></thead><tbody><tr><td>1</td><td>0</td><td>0</td><td>0</td><td>?</td></tr><tr><td>2</td><td>1</td><td>0</td><td>0</td><td>?</td></tr><tr><td>3</td><td>0</td><td>1</td><td>1</td><td>?</td></tr><tr><td>4</td><td>0</td><td>1</td><td>0</td><td>?</td></tr></tbody></table></div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-5" data-ctf-title="05 · Etapa 04"><button class="carta" type="button" data-ctf-read="ctf-5-5" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">05 · Etapa 04</span></button><div class="ctf-fixed-content" id="ctf-5-5-content" hidden><h2>05 · Etapa 04</h2><p>Desenhe as portas; identifique entrada, processamento e saída; dê um exemplo de hardware e um de software envolvidos.</p></div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-6" data-ctf-title="06 · Etapa 05"><button class="carta" type="button" data-ctf-read="ctf-5-6" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">06 · Etapa 05</span></button><div class="ctf-fixed-content" id="ctf-5-6-content" hidden><h2>06 · Etapa 05</h2><p>Leia as quatro saídas na ordem dos testes como binário e converta para decimal: esse será o código.</p></div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-7" data-ctf-title="07 · Dica"><button class="carta" type="button" data-ctf-read="ctf-5-7" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">07 · Dica</span></button><div class="ctf-fixed-content" id="ctf-5-7-content" hidden><h2>07 · Dica</h2>Resolva os parênteses antes de aplicar o AND final.</div></div><div class="ctf-static-wrapper" data-ctf-fixed id="ctf-5-8" data-ctf-title="08 · Monte sua flag"><button class="carta" type="button" data-ctf-read="ctf-5-8" aria-haspopup="dialog"><span class="envelope" aria-hidden="true"><span class="selo">💌</span></span><span class="nome-carta">08 · Monte sua flag</span></button><div class="ctf-fixed-content" id="ctf-5-8-content" hidden><h2>08 · Monte sua flag</h2><p>Use <code>MT{SIS-DD}</code>, substituindo DD pelo código decimal com dois algarismos.</p><p>Registre cálculos e justificativas no Whiteboard. Confira a flag e registre o resultado na tabela da equipe no Loop.</p><a href="../../index.html?desafio=5#verificador">Verificar a flag da estação 05 →</a></div></div></section>
       <p id="vazio" class="vazio">
         Seu mural começa com uma mensagem.<br />Crie um envelope e escreva
         diretamente na carta.
@@ -83,5 +87,6 @@
       </article>
     </dialog>
     <script src="../../assets/voltar.js"></script>
+<dialog id="ctf-reader" aria-labelledby="ctf-reader-title"><form method="dialog"><button class="ctf-close" aria-label="Fechar cartão">Fechar ×</button></form><h2 id="ctf-reader-title"></h2><div id="ctf-reader-content"></div></dialog><script src="../../assets/cartoes-fixos.js"></script>
 </body>
 </html>

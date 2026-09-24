@@ -932,8 +932,8 @@
       slot.innerHTML = '<strong aria-hidden="true">+</strong><span>forjar carta</span>';   // texto fixo
       frag.append(slot);
 
-      this.ui.field.replaceChildren(frag);
-      const n = cards.length;
+      this.ui.field.replaceChildren(...this.ui.field.querySelectorAll(":scope > [data-ctf-fixed]"), frag);
+      const n = cards.length + this.ui.field.querySelectorAll("[data-ctf-fixed]").length;
       this.ui.fieldCount.textContent = n
         ? `${n} carta${n > 1 ? 's' : ''} em jogo`
         : 'mesa vazia — forje sua primeira carta';

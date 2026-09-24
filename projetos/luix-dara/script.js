@@ -66,7 +66,7 @@ modalForm.addEventListener('click', (e) => {
 
 // Renderizar Mural (Inclui o Card Translúcido de Adicionar + Envelopes)
 function renderizarMural() {
-  mural.innerHTML = '';
+  Array.from(mural.children).filter(el => !el.hasAttribute('data-ctf-fixed')).forEach(el => el.remove());
 
   // 1. Criar e inserir o Card Translúcido de Adicionar (+)
   const addCard = document.createElement('li');

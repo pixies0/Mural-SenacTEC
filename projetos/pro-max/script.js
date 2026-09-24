@@ -65,7 +65,7 @@ function persistir() {
 }
 
 function renderizarMural() {
-  $("cartas").replaceChildren();
+  Array.from($("cartas").children).filter(el => !el.hasAttribute("data-ctf-fixed")).forEach(el => el.remove());
 
   for (const carta of estado.cartas) {
     const botao = document.createElement("button");
@@ -86,7 +86,7 @@ function renderizarMural() {
     $("cartas").append(botao);
   }
 
-  const total = estado.cartas.length;
+  const total = estado.cartas.length + $("cartas").querySelectorAll("[data-ctf-fixed]").length;
 
   $("quantidade").textContent =
     `${total} ${total === 1 ? "envelope" : "envelopes"}`;

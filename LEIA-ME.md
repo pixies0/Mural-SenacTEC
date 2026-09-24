@@ -1,58 +1,81 @@
-# Mural Técnico — portal de projetos
+# Mural Técnico — Operação Reiniciar
 
-Portal em HTML, CSS e JavaScript puro, sem instalação de pacotes ou etapa de compilação. Inclui os cinco projetos do ZIP original.
+Portal em HTML, CSS e JavaScript puro, com seis projetos e seis desafios fixos.
 
-## Publicar no GitHub Pages
+## Atualizar o GitHub Pages
 
-1. Extraia o ZIP no seu computador.
-2. Crie um repositório no GitHub (por exemplo, `mural-tecnico`). Um repositório público permite usar o Pages no plano gratuito.
-3. Envie **o conteúdo** da pasta extraída ao repositório. O arquivo `index.html` deve ficar na raiz, junto das pastas `assets` e `projetos`. Não envie apenas o ZIP.
-4. Abra **Settings → Pages**.
-5. Em **Build and deployment → Source**, escolha **Deploy from a branch**.
-6. Em **Branch**, selecione **main** e **/(root)**. Clique em **Save**.
-7. Aguarde a publicação. O endereço aparecerá na própria tela Pages; geralmente será `https://SEU-USUARIO.github.io/mural-tecnico/`.
+Extraia este ZIP e copie o conteúdo da pasta `mural` para a raiz do seu repositório, substituindo os arquivos correspondentes. Preserve a pasta `.git` que já existe no seu computador. O pacote não contém o histórico Git.
 
-Documentação oficial: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+O `index.html`, a pasta `assets` e a pasta `projetos` devem estar no mesmo nível. Faça o commit e envie a atualização ao GitHub como de costume. Não envie apenas o ZIP. O arquivo `.nojekyll` está incluído.
 
-## Experimentar no computador
+## O que mudou
 
-Abra `index.html` no navegador. Para testar todas as funcionalidades, especialmente a Carta Oculta, prefira um servidor local como a extensão Live Server do VS Code. Quem já tem Python pode executar `python -m http.server 8000` nesta pasta e acessar `http://localhost:8000`.
+- Card para `projetos/pedro/index.html`; seis projetos na apresentação.
+- 48 cartões permanentes no HTML, distribuídos nas grades dos próprios murais. Eles usam o visual de cada projeto e dividem missão, etapas, dica e montagem da flag.
+- Nenhuma missão depende de localStorage, IndexedDB, cookies ou cadastro de envelopes. JavaScript abre os envelopes e a leitura ampliada; o conteúdo é publicado diretamente no HTML.
+- A página de Becca & Cleones entra diretamente no mural para que a tela inicial não cubra a missão.
+- Retorno ao portal também no projeto do Pedro.
+- Verificador na página principal para seis flags e a flag final.
+- A versão do Geizer e os demais scripts originais foram preservados.
 
-## Organização
+## Estações
 
-- `index.html`: página inicial e cartões com os links das atividades.
-- `assets/style.css`: aparência e adaptação para celular.
-- `assets/script.js`: retorno do foco ao cartão do projeto visitado.
-- `assets/voltar.js`: atalho “Voltar ao portal” dentro das atividades.
-- `projetos/`: cada trabalho em sua própria pasta.
+| Estação | Projeto | Conteúdo | Formato |
+| --- | --- | --- | --- |
+| 01 | Becca & Cleones | Bit e verdadeiro/falso | MT{BIT-DD} |
+| 02 | Geizer | AND, OR e NOT | MT{LOG-DD} |
+| 03 | Jodan & Ryan | NAND e NOR | MT{INV-DD} |
+| 04 | Luix & Dara | Decimal e binário | MT{BIN-DD} |
+| 05 | PRO MAX | Expressão lógica e sistemas digitais | MT{SIS-DD} |
+| 06 | Pedro | Requisitos funcionais e não funcionais | MT{REQ-DD} |
 
-| Grupo (nome da pasta original) | Pasta de publicação |
-| --- | --- |
-| becca&cleones | projetos/becca-cleones/ |
-| geizer | projetos/geizer/ |
-| jodan&ryan | projetos/jodan-ryan/ |
-| Luix&Dara | projetos/luix-dara/ |
-| pro max 10 10 | projetos/pro-max/ |
+DD é o código decimal com dois algarismos. A flag final junta os seis códigos, em ordem: `MT{DD-DD-DD-DD-DD-DD}`. Nesta versão, as flags são comuns a todas as equipes: identifique o grupo na tabela do Loop, e não dentro da flag.
 
-## Personalizar e acrescentar projetos
+## Condução
 
-Edite os textos de `index.html` para ajustar título, nomes dos alunos e descrições. Os nomes dos grupos foram inferidos das pastas, sem expandir nomes ou corrigir grafias.
+1. Compartilhe o endereço do portal e a tabela do Loop.
+2. Cada equipe resolve as seis estações, registrando cálculos e justificativas no Whiteboard.
+3. O aluno acessa “Verificar flag” no enunciado; o portal já seleciona a estação correspondente.
+4. A equipe digita a flag completa. A conferência aceita letras minúsculas e ignora espaços, mas exige o código com dois algarismos.
+5. Se correta, a flag pode ser copiada e colada no Loop. Se a cópia automática não estiver disponível, o campo é selecionado para cópia manual.
+6. O instrutor confere a evidência e a explicação. Acertar o código não comprova sozinho a resolução de todas as questões.
+7. Ao terminar as seis estações, a equipe monta a flag final e explica o efeito do bloqueio na porta da estação 05.
 
-Para adicionar um trabalho:
+Modelo para criar a tabela no Loop:
 
-1. Crie uma pasta em `projetos`, com nome simples, sem espaços ou acentos.
-2. Copie o HTML, CSS, JavaScript e demais arquivos do trabalho, preservando seus caminhos internos.
-3. Duplique um bloco `<article class="project">` no `index.html` do portal.
-4. Altere o link, grupo, título, descrição, capa tipográfica, número e o identificador do título (`id` e `aria-labelledby` devem corresponder e ser únicos).
-5. Atualize a contagem e a frase “Cinco jeitos de criar”.
-6. Para incluir o retorno, adicione `<script src="../../assets/voltar.js"></script>` antes de `</body>` na página principal do novo trabalho, se ela ficar no mesmo nível das outras.
+| Equipe | Estação | Flag conferida | Evidência no Whiteboard | Validação do instrutor |
+| --- | --- | --- | --- | --- |
+| G01 | 01 | | | |
+| G01 | 02 | | | |
+| G01 | 03 | | | |
+| G01 | 04 | | | |
+| G01 | 05 | | | |
+| G01 | 06 | | | |
+| G01 | Final | | | |
 
-## O que foi preservado e integrado
+Repita as linhas para as demais equipes. O site não envia dados ao Teams e não possui placar compartilhado. O resultado da conferência é temporário; copiar para o Loop é uma etapa manual.
 
-Os códigos das atividades foram mantidos. Apenas foi incluído o script do atalho de retorno. Foram reorganizadas as pastas de publicação e retiradas cópias de backup, testes, inicializadores locais e documentos de planejamento do pacote web. A licença enviada com o projeto Luix & Dara foi preservada. O ZIP original permanece como referência completa.
+## Editar as missões
 
-O portal usa caminhos relativos, inclusive nas imagens e folhas de estilo, para funcionar em subpastas do GitHub Pages. Não há dependências externas no portal. A Carta Oculta e o Mural Digital mantêm referências externas a fontes/ícones dos projetos originais.
+Os textos ficam diretamente em cada `projetos/NOME/index.html`, nos elementos `data-ctf-fixed` das grades dos murais. Não crie envelopes pelo navegador para distribuir instruções. Edite o HTML e publique a atualização.
 
-As atividades não têm servidor nem banco de dados compartilhado: Becca & Cleones, Luix & Dara e PRO MAX armazenam dados localmente; Carta Oculta usa IndexedDB e criptografia no navegador; Geizer mantém os cartões apenas enquanto a página está aberta. Publicar no Pages não sincroniza essas mensagens entre os alunos. A Carta Oculta deve ser acessada em HTTPS ou localhost para usar as APIs de criptografia.
+- `assets/cartoes-fixos.css`: complementos de leitura dos cartões nativos.
+- `assets/cartoes-fixos.js`: abre em uma janela de leitura o conteúdo que já está escrito no HTML.
+- `assets/ctf.css`: aparência da apresentação e do verificador.
+- `assets/ctf.js`: formatos, respostas esperadas e lógica de conferência.
 
-Este pacote prepara a publicação; ele não cria um repositório nem publica automaticamente na sua conta.
+Se mudar uma resposta, atualize também a resposta esperada em `assets/ctf.js`, o formato quando necessário e a flag final. As respostas do verificador estão no código público: esta é uma atividade didática, não uma plataforma CTF antifraude. Peça a demonstração do raciocínio. Sem servidor, não há como garantir segredo das respostas, autenticação de equipe ou validação protegida.
+
+## Dados dos murais
+
+As funcionalidades livres originais continuam disponíveis. Alguns projetos guardam seus envelopes no armazenamento local do navegador. Esses dados não são usados para distribuir os desafios. As instruções fixas permanecem disponíveis mesmo sem dados locais. A leitura interativa dos envelopes exige JavaScript.
+
+## Verificação realizada
+
+Conferidos os 39 caminhos locais, os seis cards, os 48 cartões no HTML, os identificadores e a sintaxe dos scripts externos e inline. Testada a lógica das sete flags, incluindo resposta errada, normalização, seleção por URL e cópia manual alternativa. A revisão visual em navegador não pôde ser executada neste ambiente. Antes da aula, abra o portal em um computador e um celular e confira o acesso ao Loop com uma conta de aluno.
+
+## Cartões permanentes
+
+Os cartões da missão ficam na mesma grade usada pelo projeto do aluno. Não podem ser editados nem apagados pelos controles de mensagens livres. As rotinas de renderização preservam esses nós ao criar, excluir ou limpar mensagens pessoais. O botão “Ler cartão” amplia os textos; nos murais de envelopes, clique no envelope para ler.
+
+Becca & Cleones: 8 cartões; Geizer: 7; Jodan & Ryan: 8; Luix & Dara: 9; PRO MAX: 8; Pedro: 8. As flags e o verificador foram mantidos.
